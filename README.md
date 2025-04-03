@@ -55,9 +55,7 @@ Once launched, the application provides the following options:
 1. Add a new user  
 2. Delete a user  
 3. Edit user data  
-4. Display the user list  
-5. Search for a user  
-6. Exit the program  
+4. Display the user list
 
 Follow the on-screen instructions to perform the desired operations.  
 
