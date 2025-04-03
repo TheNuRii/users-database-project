@@ -1,102 +1,96 @@
-# Users Database Project
 
-**Users Database Project** to aplikacja napisana w języku C, która umożliwia zarządzanie bazą danych użytkowników. Projekt demonstruje podstawowe operacje na danych, takie jak dodawanie, usuwanie, edycja oraz wyszukiwanie użytkowników w bazie danych.
+# Users Database Project (I'm still working on some functionality)
 
-## Spis treści
+**Users Database Project** is a C application that enables managing a user database. The project demonstrates fundamental data operations such as adding, deleting, editing, and searching for users in the database.  
 
-- [Wymagania](#wymagania)
-- [Instalacja](#instalacja)
-- [Użycie](#użycie)
-- [Struktura projektu](#struktura-projektu)
-- [Contributing](#contributing)
-- [Licencja](#licencja)
-- [Autor](#autor)
+## Table of Contents  
 
-## Wymagania
+- [Requirements](#requirements)  
+- [Installation](#installation)  
+- [Usage](#usage)  
+- [Project Structure](#project-structure)  
+- [Contributing](#contributing)  
+- [License](#license)  
+- [Author](#author)  
 
-Aby skompilować i uruchomić ten projekt, potrzebujesz:
+## Requirements  
 
-- Kompilatora języka C (np. GCC)
-- Systemu operacyjnego zgodnego z POSIX (np. Linux, macOS)
+To compile and run this project, you need:  
 
-## Instalacja
+- A C compiler (e.g., GCC)  
+- A POSIX-compatible operating system (e.g., Linux, macOS)  
 
-1. Sklonuj repozytorium na swój lokalny komputer:
+## Installation  
+
+1. Clone the repository to your local machine:  
 
    ```bash
    git clone https://github.com/TheNuRii/users-database-project.git
-   ```
-
+   ```  
 
-2. Przejdź do katalogu projektu:
+2. Navigate to the project directory:  
 
    ```bash
    cd users-database-project
-   ```
-
+   ```  
 
-3. Skompiluj projekt za pomocą `Makefile`:
+3. Compile the project using `Makefile`:  
 
    ```bash
    make
-   ```
-
+   ```  
 
-   Polecenie to wygeneruje plik wykonywalny o nazwie `users-database`.
+   This command will generate an executable file named `users-database`.  
 
-## Użycie
+## Usage  
 
-Aby uruchomić aplikację, wykonaj:
-
+To run the application, execute:  
 
 ```bash
 ./users-database
-```
-
+```  
 
-Po uruchomieniu aplikacji dostępne są następujące opcje:
+Once launched, the application provides the following options:  
 
-1. Dodaj nowego użytkownika
-2. Usuń użytkownika
-3. Edytuj dane użytkownika
-4. Wyświetl listę użytkowników
-5. Wyszukaj użytkownika
-6. Zakończ program
+1. Add a new user  
+2. Delete a user  
+3. Edit user data  
+4. Display the user list  
+5. Search for a user  
+6. Exit the program  
 
-Postępuj zgodnie z instrukcjami wyświetlanymi na ekranie, aby wykonywać poszczególne operacje.
+Follow the on-screen instructions to perform the desired operations.  
 
-## Struktura projektu
+## Project Structure  
 
-Projekt składa się z następujących katalogów i plików:
+The project consists of the following directories and files:  
 
-- `src/`: Zawiera kod źródłowy aplikacji.
-- `include/`: Zawiera pliki nagłówkowe.
-- `bin/`: Katalog przeznaczony na pliki wykonywalne (po kompilacji).
-- `.vscode/`: Ustawienia środowiska Visual Studio Code.
-- `.gitignore`: Plik określający, które pliki/katalogi powinny być ignorowane przez Git.
-- `Makefile`: Skrypt do automatyzacji procesu kompilacji projektu.
-- `README.md`: Niniejszy plik z informacjami o projekcie.
+- `src/`: Contains the application's source code.  
+- `include/`: Stores header files.  
+- `bin/`: Directory for compiled executable files.  
+- `.vscode/`: Configuration settings for Visual Studio Code.  
+- `.gitignore`: Specifies files and directories to be ignored by Git.  
+- `Makefile`: A script for automating the project's compilation process.  
+- `README.md`: This file with project details.  
 
-## Contributing
+## Contributing  
 
-Jeśli chcesz przyczynić się do rozwoju tego projektu:
+If you want to contribute to this project:  
 
-1. Sforkuj to repozytorium.
-2. Utwórz nową gałąź (`git checkout -b feature/nazwa-funkcji`).
-3. Wprowadź swoje zmiany i zatwierdź je (`git commit -m 'Dodano nową funkcję'`).
-4. Wypchnij zmiany do swojego forka (`git push origin feature/nazwa-funkcji`).
-5. Utwórz Pull Request, opisując wprowadzone zmiany.
+1. Fork this repository.  
+2. Create a new branch (`git checkout -b feature/feature-name`).  
+3. Make your changes and commit them (`git commit -m 'Added new feature'`).  
+4. Push the changes to your fork (`git push origin feature/feature-name`).  
+5. Create a Pull Request describing your modifications.  
 
-Wszelkie sugestie i uwagi są mile widziane!
+Any suggestions and contributions are welcome!  
 
-## Licencja
+## License  
 
-Ten projekt jest udostępniany na licencji MIT. Szczegółowe informacje znajdują się w pliku `LICENSE`.
+This project is licensed under the MIT License. See the `LICENSE` file for details.  
 
-## Autor
+## Author  
 
-Projekt został stworzony przez [TheNuRii](https://github.com/TheNuRii).
+The project was created by [TheNuRii](https://github.com/TheNuRii).  
 
 ---
-
-Powyższy plik README dostarcza kompleksowych informacji na temat projektu, jego funkcjonalności, sposobu instalacji oraz użytkowania. Dzięki takiej strukturze, inni programiści oraz użytkownicy będą mogli łatwo zrozumieć cel projektu i w razie potrzeby przyczynić się do jego rozwoju. 
