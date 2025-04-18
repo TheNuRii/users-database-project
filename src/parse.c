@@ -160,4 +160,37 @@ int create_db_header(int fd, struct dbheader_t **headerOut) {
 	return STATUS_SUCCESS;
 }
 
+void remove_employee(char *name, struct dbheader_t *dbhdr, struct employee_t *employees) {
+	int i = 0;
+	for (; i < dbhdr->count; i++){
+		if (strcmp(employees->name, name)) {
+			free(employees[i].name);
+			free(employees[i].address);
+			employees[i].hours = 0;
+			break;
+		}
+	}
+
+	for (; i < dbhdr->count; i++) {
+		employees[i] = employees[i+1];
+	}
+	dbhdr->count--;
+	employees = (struct employee_t *)realloc(employees, dbhdr->count * sizeof(struct employee_t));
+	if (employees == NULL) {
+		printf("Realloc failed\n");
+		return;
+	}
+}
+
+void find_employee(char *name, struct dbheader_t *dbhdr, struct employee_t *employee) {
+	int i = 0;
+	for (;i < dbhdr->count; i++) {
+		
+	}
+	printf("Name: %s\n", employee->name);
+	printf("Address: %s\n", employee->address);
+	printf("Hours: %d\n", employee->hours);
+}
+
+
 

@@ -20,6 +20,8 @@ int main(int argc, char *argv[]) {
 	unsigned short port = 0;
 	bool newfile = false;
 	bool list = false;
+	bool remove = false;
+	bool find = false;
   char *addstring = NULL;
 	int c;
 
@@ -38,12 +40,19 @@ int main(int argc, char *argv[]) {
 			case 'p':
 				portarg = optarg;
 				break;
-      case 'a':
-        addstring = optarg;
-        break;
+			case 'r':
+				remove = true;
+				break;
+			case 's':
+				find = true;
+				break;
 			case 'l':
 				list = true;
 				break;
+      case 'a':
+        addstring = optarg;
+        break;
+			
 			case '?':
 				printf("Unknown option -%c\n", c);
 				break;
@@ -100,9 +109,14 @@ int main(int argc, char *argv[]) {
 		list_employees(dbhdr, employees);
 	}
 
+	if (remove) {
+		remove_employee(addstring, dbhdr, employees);
+	}
+	if (find) {
+		find_employee(employees);
+	}
 
 	output_file(dbfd, dbhdr, employees);
-
 
 	return 0;
 }

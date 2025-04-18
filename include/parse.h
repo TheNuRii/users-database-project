@@ -17,6 +17,8 @@ struct employee_t{
 };
 
 int add_employee(struct dbheader_t *dbhdr, struct employee_t *employees, char *addstring);
+void remove_employee(char *name, struct dbheader_t *dbhdr, struct employee_t *employees);
+void find_employee(char *name, struct dbheader_t *dbhdr, struct employee_t *employee);
 int read_employees(int fd, struct dbheader_t *dbhdr, struct employee_t **employeesOut);
 void list_employees(struct dbheader_t *dbhdr, struct employee_t *employees); 
 
