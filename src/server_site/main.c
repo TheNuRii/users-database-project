@@ -6,12 +6,20 @@
 #include "common.h"
 #include "file.h"
 #include "parse.h"
+#include "serverpoll.h"
+
+clientstate_t clientStates[MAX_CLIENTS] = {0};
 
 void print_usage(char *argv[]) {
 	printf("Usage: %s -n -f <database file>\n", argv[0]);
 	printf("\t -n  - create new database file\n");
 	printf("\t -f  - (required) path to database file\n");
+	printf("\t -p  - (required) port to listen to\n");
 	return;
+}
+
+void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees) {
+	int listen_fd, conn_fd, freeSlot;
 }
 
 int main(int argc, char *argv[]) { 
@@ -22,7 +30,7 @@ int main(int argc, char *argv[]) {
 	bool list = false;
 	bool remove = false;
 	bool find = false;
-  char *addstring = NULL;
+  	char *addstring = NULL;
 	int c;
 
 	int dbfd = -1;
@@ -39,6 +47,10 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'p':
 				portarg = optarg;
+				port = atoi(portarg);
+				if (port == 0) {
+					printf("Bad port: %s\n", portarg);
+				}
 				break;
 			case 'r':
 				remove = true;
@@ -49,10 +61,9 @@ int main(int argc, char *argv[]) {
 			case 'l':
 				list = true;
 				break;
-      case 'a':
-        addstring = optarg;
-        break;
-			
+      		case 'a':
+        		addstring = optarg;
+        		break;
 			case '?':
 				printf("Unknown option -%c\n", c);
 				break;
@@ -69,7 +80,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-
+	if ()
 	if (newfile) {
 		dbfd = create_db_file(filepath);
 		if (dbfd == STATUS_ERROR) {

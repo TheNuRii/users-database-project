@@ -5,37 +5,19 @@
 #include <stdio.h>
 #include <unistd.h>
 
-typedef enum {
-    PROTO_HELLO,
-} proto_type_e;
+#include "common.h"
 
-// TLV
-typedef struct {
-    proto_type_e type;
-    unsigned short len;
-} proto_hdr_t;
-
-
-void handle_client(int fd){
+void send_hello(int fd){
     char buf[4096] = {0};
-    read(fd, buf, sizeof(proto_hdr_t) + sizeof(int));
 
-    proto_hdr_t *hdr = (proto_hdr_t*)buf;
-    hdr->type = (proto_type_e)ntohl(hdr->type);
-    hdr->len = (proto_type_e)ntohs(hdr->len);
+    dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
+    hdr->type = MSG_HELLO_REQ;
+    hdr->len = 1;
 
-    int *data = (int *)(&hdr[1]);
-    *data = htonl(*data);
+    hdr->type = (dbproto_type_e)htonl(hdr->type);
+    hdr->len = htons(hdr->len);
 
-    if (hdr->type != PROTO_HELLO) {
-        printf("Protocol mismatch, failing.\n");
-        return;
-    }
-
-    if (*data != 1) {
-        printf("Protocol version mismatch, faling.\n");
-        return;
-    }
+    write(fd, buf, sizeof(dbproto_hdr_t));
 
     printf("Server connected, protocol v1.\n");
 }
@@ -45,11 +27,12 @@ int main(int argc, char *argv[]) {
         printf("Usage: %s <ip of the host>\n", argv[0]);
         return 0;
     }
+
     struct sockaddr_in serverInfo = {0};
 
     serverInfo.sin_family = AF_INET;    
     serverInfo.sin_addr.s_addr = inet_addr(argv[1]);
-    serverInfo.sin_port = htons(5555);
+    serverInfo.sin_port = htons(8080);
 
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd == -1) {
@@ -63,6 +46,6 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    handle_client(fd);
+    send_hello(fd);
     close(fd);
 }
