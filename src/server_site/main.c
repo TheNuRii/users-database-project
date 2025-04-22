@@ -2,6 +2,12 @@
 #include <stdbool.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/time.h>
 
 #include "common.h"
 #include "file.h"
@@ -20,6 +26,48 @@ void print_usage(char *argv[]) {
 
 void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees) {
 	int listen_fd, conn_fd, freeSlot;
+	struct sockaddr_in server_addr, client_addr;
+	socklen_t client_len = sizeof(client_addr);
+	
+	struct pollfd fds[MAX_CLIENTS + 1];
+	int nfds = 1;
+	int opt = 1;
+
+	init_clients(&clientStates);
+
+	if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		perror("socket");
+		exit(EXIT_FAILURE);
+	}
+
+	if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+		perror("socket");
+		exit(EXIT_FAILURE);
+	}
+
+	memset(&server_addr, 0, sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = INADDR_ANY;
+	server_addr.sin_port = htons(PORT);
+
+	// Bind
+	if (bind(listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+		perror("bind");
+		exit(EXIT_FAILURE);
+	}
+
+	// listen 
+	if (listen(listen_fd, 10) == -1) {
+		perror("liste");
+		exit(EXIT_FAILURE);
+	}
+
+	printf("Server listenig on port %d\n", PORT);
+
+	memset(fds, 0, sizeof(fds));
+	fds[0].fd = listen_fd;
+	fds[0].events = POLLIN;
+	nfds = 1;
 }
 
 int main(int argc, char *argv[]) { 
