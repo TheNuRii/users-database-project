@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -7,7 +6,6 @@
 
 #include "file.h"
 #include "common.h"
-
 
 int create_db_file(char *filename) {
 	int fd = open(filename, O_RDWR);
@@ -35,5 +33,3 @@ int open_db_file(char *filename) {
 
 	return fd;
 }
-
-

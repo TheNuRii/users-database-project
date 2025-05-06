@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 
-#include "common.h"
+#include "../include/common.h"
 #include "file.h"
 #include "parse.h"
 #include "serverpoll.h"
@@ -50,13 +50,11 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	server_addr.sin_port = htons(PORT);
 
-	// Bind
 	if (bind(listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
 		perror("bind");
 		exit(EXIT_FAILURE);
 	}
 
-	// listen 
 	if (listen(listen_fd, 10) == -1) {
 		perror("liste");
 		exit(EXIT_FAILURE);
@@ -68,6 +66,67 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 	fds[0].fd = listen_fd;
 	fds[0].events = POLLIN;
 	nfds = 1;
+
+	while (1) {
+		int ii = 1;
+		for (int i = 0; i < MAX_CLIENTS; i++) {
+			if (clientStates[i].fd != -1) {
+				fds[ii].fd = clientStates[i].fd; // Offset by 1 for listen_fd
+				fds[ii].events = POLLIN;
+				ii++;
+			}
+		}
+
+
+		int n_events = poll(fds, nfds, -1); // -1 means no timeout
+		if (n_events == -1) {
+			perror("poll");
+			exit(EXIT_FAILURE);
+		}
+		
+		if (fds[0].revents & POLLIN) {
+			if ((conn_fd = accept(listen_fd, (struct sockaddr *)&client_addr,
+		&client_len)) == -1) {
+			perror("accept");
+			continue;
+		}
+
+		printf("New connection from %s:%d\n",
+		inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
+		freeSlot = find_free_slot(&client_addr.sin_port);
+		if (freeSlot == -1) {
+			printf("Server full: closing new connection\n");
+			close(conn_fd);
+		} else {
+			clientStates[freeSlot].fd = conn_fd;
+			clientStates[freeSlot].state = STATE_CONNECTED;
+			nfds++;
+			printf("Slot %d has fd %d\n", freeSlot, clientStates[freeSlot].fd);
+		}
+
+		n_events--;
+	}
+
+	for (int i = 1; i <= nfds && n_events > 0; i++) { // Start from 1 to skip the listen_fd
+		if (fds[i].revents & POLLIN) {
+			n_events--;
+
+			int fd =  fds[i].fd;
+			int slot = find_slot_by_fd(&clientStates, fd);
+			ssize_t bytes_read = 
+			read(fd, &clientStates[slot].buffer, sizeof(clientStates[slot].buffer));
+			if (bytes_read <= 0) {
+				close(fd);
+				if (slot == -1) {
+					printf("Tried to close fd that dosent exist?\n");
+				} else {
+					printf("Received data form client: %s\n", clientStates[slot].buffer);
+				}
+			}
+		}
+	}
+}
 }
 
 int main(int argc, char *argv[]) { 
@@ -75,10 +134,10 @@ int main(int argc, char *argv[]) {
 	char *portarg = NULL;
 	unsigned short port = 0;
 	bool newfile = false;
-	bool list = false;
-	bool remove = false;
-	bool find = false;
-  	char *addstring = NULL;
+	//bool list = false;
+	// bool remove = false;
+	//bool find = false;
+  	// char *addstring = NULL;
 	int c;
 
 	int dbfd = -1;
@@ -100,18 +159,6 @@ int main(int argc, char *argv[]) {
 					printf("Bad port: %s\n", portarg);
 				}
 				break;
-			case 'r':
-				remove = true;
-				break;
-			case 's':
-				find = true;
-				break;
-			case 'l':
-				list = true;
-				break;
-      		case 'a':
-        		addstring = optarg;
-        		break;
 			case '?':
 				printf("Unknown option -%c\n", c);
 				break;
@@ -128,7 +175,12 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	if ()
+	if (port == 0) {
+		printf("Port not set\n");
+		print_usage(argv);
+		return 0;
+	}
+
 	if (newfile) {
 		dbfd = create_db_file(filepath);
 		if (dbfd == STATUS_ERROR) {
@@ -158,7 +210,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	if (addstring) {
+	/* if (addstring) {
 		dbhdr->count++;
 		employees = (struct employee_t *)realloc(employees, dbhdr->count * sizeof(struct employee_t));
 		add_employee(dbhdr, employees, addstring);
@@ -173,7 +225,9 @@ int main(int argc, char *argv[]) {
 	}
 	if (find) {
 		find_employee(employees);
-	}
+	} */
+
+	poll_loop(port, dbhdr, employees);
 
 	output_file(dbfd, dbhdr, employees);
 

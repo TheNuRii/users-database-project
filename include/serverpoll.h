@@ -14,7 +14,7 @@ typedef enum {
     STATE_DISCONNECTED,
     STATE_HELLO,
     STATE_MSG,
-    STATE_GOODBYE
+    STATE_GOODBYE,
 } state_e;
 
 typedef struct {
@@ -29,6 +29,6 @@ int find_free_slot(clientstate_t* states);
 
 int find_slot_by_fd(clientstate_t* states, int fd);
 
-void handle_client_fsm(struct dbhearder_t *dbhdr, struct employee_t *employees, clientstate_t);
+void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **employees, clientstate_t *client, int dbfd);
 
 #endif
