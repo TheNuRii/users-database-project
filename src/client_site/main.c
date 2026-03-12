@@ -10,6 +10,7 @@
 
 
 #include "common.h"
+#include <bits/getopt_core.h>
 
 int list_employees(int fd) {
   char buf[4096] = {0};
@@ -61,7 +62,7 @@ int send_employee(int fd, char *addstr) {
 
   // send the hello request with the version we speak
   dbproto_employee_add_req* employee = (dbproto_employee_add_req*)&hdr[1];
-  strncpy(&employee->data, addstr, sizeof(employee->data));
+  strncpy(employee->data, addstr, sizeof(employee->data));
 
   hdr->type = (dbproto_type_e)htonl(hdr->type);
   hdr->len = htons(hdr->len);
@@ -91,7 +92,7 @@ int send_employee(int fd, char *addstr) {
 
 int send_hello(int fd) {
   char buf[4096] = {0};
-
+  
   dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
   hdr->type = MSG_HELLO_REQ;
   hdr->len = 1;
@@ -104,10 +105,8 @@ int send_hello(int fd) {
   hdr->len = htons(hdr->len);
   hello->proto = htons(hello->proto);
 
-  // write the hello message
   write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_hello_req));
   
-  // recv the response
   read(fd, buf, sizeof(buf));
 
   hdr->type = (dbproto_type_e)ntohl(hdr->type);
@@ -120,7 +119,6 @@ int send_hello(int fd) {
     return STATUS_ERROR;
   }
 
-  // return success
   printf("Server connected, protocol v1.\n");
   return STATUS_SUCCESS;
 }
@@ -136,9 +134,6 @@ int main(int argc, char *argv[]) {
     switch (c) {
       case 'a':
         addarg = optarg;
-        break;
-      case 'l':
-        list = true;
         break;
       case 'p':
         portarg = optarg;
@@ -156,7 +151,7 @@ int main(int argc, char *argv[]) {
 
 
   if (port == 0) {
-    printf("Bad port: %s\n", portarg);
+    printf("Bad port: %s\n", portarg ? portarg : "not specified");
     return -1;
   }
 
@@ -194,6 +189,6 @@ int main(int argc, char *argv[]) {
     list_employees(fd);
   }
 
+  //send_hello(fd);
   close(fd);
-
 }

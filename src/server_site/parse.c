@@ -6,7 +6,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
-
 #include "common.h"
 #include "parse.h"
 
@@ -26,12 +25,15 @@ int add_employee(struct dbheader_t *dbhdr, struct employee_t *employees, char *a
 	char *name = strtok(addstring, ",");
 
 	char *addr = strtok(NULL, ",");
+	if (addr == NULL) {
+		return STATUS_ERROR;
+	}
 
 	char *hours = strtok(NULL, ",");
-
-	printf("%s %s %s\n", name, addr, hours);
-
-	
+	if  (hours == NULL || atoi(hours) == 0) {
+		return STATUS_ERROR;
+	}
+		
 	strncpy(employees[dbhdr->count-1].name, name, sizeof(employees[dbhdr->count-1].name));
 	strncpy(employees[dbhdr->count-1].address, addr, sizeof(employees[dbhdr->count-1].address));
 

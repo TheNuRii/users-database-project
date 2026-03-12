@@ -33,7 +33,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 	int nfds = 1;
 	int opt = 1;
 
-	init_clients(&clientStates);
+	init_clients(clientStates);
 
 	if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		perror("socket");
@@ -48,7 +48,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = INADDR_ANY;
-	server_addr.sin_port = htons(PORT);
+	server_addr.sin_port = htons(port);
 
 	if (bind(listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
 		perror("bind");
@@ -60,7 +60,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 		exit(EXIT_FAILURE);
 	}
 
-	printf("Server listenig on port %d\n", PORT);
+	printf("Server listenig on port %d\n", port);
 
 	memset(fds, 0, sizeof(fds));
 	fds[0].fd = listen_fd;
@@ -94,7 +94,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 		printf("New connection from %s:%d\n",
 		inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
-		freeSlot = find_free_slot(&client_addr.sin_port);
+		freeSlot = find_free_slot(clientStates);
 		if (freeSlot == -1) {
 			printf("Server full: closing new connection\n");
 			close(conn_fd);
@@ -108,12 +108,12 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 		n_events--;
 	}
 
-	for (int i = 1; i <= nfds && n_events > 0; i++) { // Start from 1 to skip the listen_fd
+	for (int i = 1; i < nfds && n_events > 0; i++) { // Start from 1 to skip the listen_fd
 		if (fds[i].revents & POLLIN) {
 			n_events--;
 
 			int fd =  fds[i].fd;
-			int slot = find_slot_by_fd(&clientStates, fd);
+			int slot = find_slot_by_fd(clientStates, fd);
 			ssize_t bytes_read = 
 			read(fd, &clientStates[slot].buffer, sizeof(clientStates[slot].buffer));
 			if (bytes_read <= 0) {
@@ -126,7 +126,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 			}
 		}
 	}
-}
+	}
 }
 
 int main(int argc, char *argv[]) { 
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
 	struct dbheader_t *dbhdr = NULL;
 	struct employee_t *employees = NULL;
 
-	while ((c = getopt(argc, argv, "nf:a:l")) != -1) {
+	while ((c = getopt(argc, argv, "nf:p:")) != -1) {
 		switch (c) {
 			case 'n':
 				newfile = true;
@@ -198,15 +198,17 @@ int main(int argc, char *argv[]) {
 			printf("Unable to open database file\n");
 			return -1;
 		}
-
+		
 		if (validate_db_header(dbfd, &dbhdr) == STATUS_ERROR) {
 			printf("Failed to validate database header\n");
+			close(dbfd);
 			return -1;
 		}
 	}
 
 	if (read_employees(dbfd, dbhdr, &employees) != STATUS_SUCCESS) {
 		printf("Failed to read employees");
+		close(dbfd);
 		return 0;
 	}
 
